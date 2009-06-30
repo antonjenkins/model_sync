@@ -1,0 +1,25 @@
+= model_sync
+
+model_sync is a simple gem for pushing changes to one of your rails models to another.
+
+	class User < ActiveRecord::Base
+	  model_sync :sync_to => :student,
+	             :relationship => { :student_id => :s_stno },
+	             :mappings => { :forename => :s_forename }
+	end
+	
+Assuming we have a Student model, the above code will add an after_save callback to the User model which will push changes to the forename value into the s_forename value of Student. The correct Student instance is found using the :relationship hash - student_id in User must equal s_stno in Student.
+
+Although the above example only pushes changes to forename, you can add more mappings to the :mappings hash to push over as many values as you like.
+
+== Why use it?
+
+I developed this gem as part of a web front end which I'm building for an old legacy system. The legacy system is a student records system which holds students which are booked on courses. However I don't want to add users of the website into the system as students until they have actually booked a course. So there needs to be a certain amount of separation between the online element and the legacy system, mainly because I can't make changes to the database structure of the legacy system.
+
+Once a user books a course and becomes a student as well we've got a user and a student record we need to keep in sync because the user could change their address through the website, for example, which then needs feeding into the main system.
+
+The model_sync gem will do all the syncing for me in a totally transparent way.
+
+== Limitations
+
+Currently the changes are pushed over with an after_save hook using update_attribute on the :sync_to model. This bypasses validations and any failures on update_attribute are currently not handled.
