@@ -7,13 +7,14 @@ module ModelSync
     end
 
     module Config
-      attr_reader :slave_model_name, :slave_model_class, :relationship, :mappings
+      attr_reader :slave_model_name, :slave_model_class, :relationship, :mappings, :mapping_block
 
       def model_sync(options)
         @slave_model_name = options[:sync_to].to_s.downcase
         @slave_model_class = Kernel.const_get(@slave_model_name.classify)
         @relationship = options[:relationship]
         @mappings = options[:mappings]
+        @mapping_block = options[:mapping_block]
 
         # Add a callback to sync_changes on every save
         self.after_save :sync_changes
@@ -27,6 +28,8 @@ module ModelSync
         self.class.mappings.each do |source, dest|
           slave_instance.update_attribute(dest, self.read_attribute(source))
         end
+        # Call the mapping_block if one is supplied
+        self.class.mapping_block.call(self, slave_instance) if self.class.mapping_block
       end
     end
 
