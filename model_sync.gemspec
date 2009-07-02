@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{model_sync}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Anton Jenkins"]
-  s.date = %q{2009-07-01}
+  s.date = %q{2009-07-02}
   s.description = %q{Sync changes to an ActiveRecord model to another model}
   s.email = %q{info@pixellatedvisions.com}
   s.extra_rdoc_files = ["lib/model_sync.rb", "README.rdoc"]

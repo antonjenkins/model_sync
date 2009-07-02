@@ -5,12 +5,15 @@ model_sync is a simple gem for pushing changes to one of your rails models to an
 	class User < ActiveRecord::Base
 	  model_sync :sync_to => :student,
 	             :relationship => { :student_id => :s_stno },
-	             :mappings => { :forename => :s_forename }
+	             :mappings => { :forename => :s_forename },
+							 :mapping_block => Proc.new { |master, slave| slave.update_attribute(:s_sex, master.gender ? master.gender.code : nil) }
 	end
 	
 Assuming we have a Student model, the above code will add an after_save callback to the User model which will push changes to the forename value into the s_forename value of Student. The correct Student instance is found using the :relationship hash - student_id in User must equal s_stno in Student.
 
 Although the above example only pushes changes to forename, you can add more mappings to the :mappings hash to push over as many values as you like.
+
+When things are a bit more complicated than a simple like for like mapping you can use the :mapping_block option to pass a block which has access to the master and slave objects. Using these objects you can perform more complicated tasks than just making one value equal another.
 
 == Why use it?
 
