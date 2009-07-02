@@ -9,6 +9,7 @@ model_sync is a simple gem for pushing changes to one of your rails models to an
 	             :mapping_block => Proc.new do |master, slave|
 	                                 slave.update_attribute(:s_sex, master.gender ? master.gender.code : nil)
 	                               end
+	end
 	
 Assuming we have a Student model, the above code will add an after_save callback to the User model which will push changes to the forename value into the s_forename value of Student. The correct Student instance is found using the :relationship hash - student_id in User must equal s_stno in Student.
 
