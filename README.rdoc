@@ -24,6 +24,16 @@ Once a user books a course and becomes a student as well we've got a user and a 
 
 The model_sync gem will do all the syncing for me in a totally transparent way.
 
+== Installation
+
+If you've not already added github as a source for gem then do so:
+
+	gem sources -a http://gems.github.com
+
+Now you can install the gem:
+
+	sudo gem install antonjenkins-model_sync
+
 == Limitations
 
 Currently the changes are pushed over with an after_save hook using update_attribute on the :sync_to model. This bypasses validations and any failures on update_attribute are currently not handled.
