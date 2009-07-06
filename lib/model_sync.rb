@@ -29,21 +29,29 @@ module ModelSync
       end
     end
 
-private
+    def method_missing(id, *args, &block)
+      case(id.to_s)
+      when /^create_#{self.class.slave_model_name}$/
+        # If we've received a create_{slave_model} call then create a new instance of it and sync to it
+        new_instance = self.class.slave_model_class.new
+        perform_sync(new_instance)
+        # Save the new instance so that its primary key is generated and pass this value onto our master model
+        new_instance.save
+        self.update_attribute(self.class.relationship.keys.first, new_instance.read_attribute(self.class.relationship.values.first.to_s))
+      when /^synced_with_#{self.class.slave_model_name}\?$/
+        !!find_slave_instance
+      else
+        super
+      end
+    end
+
+  private
     def find_slave_instance
       # return nil if we don't have a value for the foreign key
       return nil unless foreign_key_value = self.read_attribute(self.class.relationship.keys.first)
       # find the instance of the slave class using the relationship hash
       self.class.slave_model_class.find(:first, 
                                         :conditions => "#{self.class.relationship.values.first.to_s} = #{foreign_key_value}")
-    end
-  end
-end
-
-if defined?(::ActiveRecord)
-  module ::ActiveRecord
-    class Base
-      include ModelSync::Base
     end
 
     def perform_sync(slave_instance)
@@ -53,6 +61,14 @@ if defined?(::ActiveRecord)
       end
       # Call the mapping_block if one is supplied
       self.class.mapping_block.call(self, slave_instance) if self.class.mapping_block
+    end
+  end
+end
+
+if defined?(::ActiveRecord)
+  module ::ActiveRecord
+    class Base
+      include ModelSync::Base
     end
   end
 end
