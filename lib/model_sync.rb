@@ -24,7 +24,7 @@ module ModelSync
     def sync_changes
       # If we can find a slave instance...
       if slave_instance = find_slave_instance
-        # ... then update all the attributes which we've mapped
+        # ...then update all the attributes which we've mapped
         self.class.mappings.each do |source, dest|
           slave_instance.update_attribute(dest, self.read_attribute(source))
         end
@@ -35,8 +35,11 @@ module ModelSync
 
 private
     def find_slave_instance
+      # return nil if we don't have a value for the foreign key
+      return nil unless foreign_key_value = self.read_attribute(self.class.relationship.keys.first)
+      # find the instance of the slave class using the relationship hash
       self.class.slave_model_class.find(:first, 
-                                        :conditions => "#{self.class.relationship.values.first.to_s} = #{self.read_attribute(self.class.relationship.keys.first)}")
+                                        :conditions => "#{self.class.relationship.values.first.to_s} = #{foreign_key_value}")
     end
   end
 end
