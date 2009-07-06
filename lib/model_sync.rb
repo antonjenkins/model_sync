@@ -24,12 +24,8 @@ module ModelSync
     def sync_changes
       # If we can find a slave instance...
       if slave_instance = find_slave_instance
-        # ...then update all the attributes which we've mapped
-        self.class.mappings.each do |source, dest|
-          slave_instance.update_attribute(dest, self.read_attribute(source))
-        end
-        # Call the mapping_block if one is supplied
-        self.class.mapping_block.call(self, slave_instance) if self.class.mapping_block
+        # ... then sync the changes over
+        perform_sync(slave_instance)
       end
     end
 
@@ -48,6 +44,15 @@ if defined?(::ActiveRecord)
   module ::ActiveRecord
     class Base
       include ModelSync::Base
+    end
+
+    def perform_sync(slave_instance)
+      # Update all the attributes which we've mapped
+      self.class.mappings.each do |source, dest|
+        slave_instance.update_attribute(dest, self.read_attribute(source))
+      end
+      # Call the mapping_block if one is supplied
+      self.class.mapping_block.call(self, slave_instance) if self.class.mapping_block
     end
   end
 end
