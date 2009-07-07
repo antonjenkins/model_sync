@@ -38,7 +38,7 @@ module ModelSync
         # Save the new instance so that its primary key is generated and pass this value onto our master model
         new_instance.save
         self.update_attribute(self.class.relationship.keys.first, new_instance.read_attribute(self.class.relationship.values.first.to_s))
-      when /^synced_with_#{self.class.slave_model_name}\?$/
+      when /^synch?ed_with_#{self.class.slave_model_name}\?$/
         !!find_slave_instance
       else
         super
