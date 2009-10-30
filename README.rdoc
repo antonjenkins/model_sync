@@ -27,14 +27,26 @@ The model_sync gem will do all the syncing for me in a totally transparent way.
 
 == Installation
 
-If you've not already added github as a source for gem then do so:
+This gem lives at gemcutter.org (which is amazing by the way!). To use gemcutter is simplicity itself:
 
-	gem sources -a http://gems.github.com
+  sudo gem install gemcutter
+  sudo gem tumble
 
-Now you can install the gem:
+And now with gemcutter as your preferred gem source you can type:
 
-	sudo gem install antonjenkins-model_sync
+  sudo gem install model_sync
 
 == Limitations
 
 Currently the changes are pushed over with an after_save hook using update_attribute on the :sync_to model. This bypasses validations and any failures on update_attribute are currently not handled.
+
+Also the instance methods which model_sync adds to a class are not available through associations. So if we did something like...
+
+  post.user.synced_with_student?
+
+... it won't work because we are going through an association. Instead you need to instantiate the user object first:
+
+  user = post.user
+  user.synced_with_student?
+
+I'm not totally sure how to get around that yet. It's something to do with an ActiveRecord association proxy being used instead of an actual instance of the target class (in this case the User class). If anyone knows how to fix that then please feel free to fork the project and patch.
