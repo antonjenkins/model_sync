@@ -44,9 +44,8 @@ Also the instance methods which model_sync adds to a class are not available thr
 
   post.user.synced_with_student?
 
-... it won't work because we are going through an association. Instead you need to instantiate the user object first:
+... it won't work because we are going through an association which actually uses a proxy behind the scenes. Instead you need to force the instantiation of the target:
 
-  user = post.user
-  user.synced_with_student?
+  post.user.target.synced_with_student?
 
 I'm not totally sure how to get around that yet. It's something to do with an ActiveRecord association proxy being used instead of an actual instance of the target class (in this case the User class). If anyone knows how to fix that then please feel free to fork the project and patch.
